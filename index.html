@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Demo IA Joyería</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const fakeProducts = [
+      { id: 1, name: "Collar Chapa de Oro", price: 120000, stock: 3, recommend: 2 },
+      { id: 2, name: "Pulsera Dorada", price: 60000, stock: 15, recommend: 3 },
+      { id: 3, name: "Aretes de lujo", price: 40000, stock: 2, recommend: 1 }
+    ];
+
+    const faq = {
+      "precios": "Nuestros precios dependen del mayoreo, desde $40.000 COP por pieza.",
+      "tiempos": "El tiempo de entrega promedio es de 3 a 5 días hábiles.",
+      "catalogo": "Puedes ver nuestro catálogo en este mismo demo."
+    };
+
+    function App() {
+      const [products, setProducts] = React.useState(fakeProducts);
+      const [cart, setCart] = React.useState(JSON.parse(localStorage.getItem("cart")) || []);
+      const [chat, setChat] = React.useState([]);
+      const [input, setInput] = React.useState("");
+
+      React.useEffect(() => {
+        localStorage.setItem("cart", JSON.stringify(cart));
+      }, [cart]);
+
+      const addToCart = (product) => {
+        setCart([...cart, product]);
+        alert(`Agregado: ${product.name}. Recomendado: ${products.find(p => p.id === product.recommend)?.name}`);
+      };
+
+      const sendMessage = () => {
+        let response = "Lo siento, no entendí tu pregunta.";
+        Object.keys(faq).forEach(key => {
+          if (input.toLowerCase().includes(key)) response = faq[key];
+        });
+        setChat([...chat, { user: input, bot: response }]);
+        setInput("");
+      };
+
+      return (
+        <div className="max-w-5xl mx-auto space-y-6">
+          <h1 className="text-3xl font-bold text-center">Prototipo IA - Joyería</h1>
+          
+          {/* Catálogo */}
+          <div className="bg-white p-4 shadow rounded">
+            <h2 className="text-xl font-semibold mb-2">Catálogo</h2>
+            <div className="grid grid-cols-3 gap-4">
+              {products.map(p => (
+                <div key={p.id} className="border p-2 rounded">
+                  <h3 className="font-medium">{p.name}</h3>
+                  <p>Precio: ${p.price.toLocaleString()}</p>
+                  <p className={p.stock < 5 ? "text-red-500" : "text-green-600"}>
+                    Stock: {p.stock} {p.stock < 5 && "⚠ Bajo"}
+                  </p>
+                  <button 
+                    onClick={() => addToCart(p)} 
+                    className="bg-yellow-500 text-white px-2 py-1 rounded mt-2">
+                    Agregar
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Chatbot */}
+          <div className="bg-white p-4 shadow rounded">
+            <h2 className="text-xl font-semibold mb-2">Asistente Virtual</h2>
+            <div className="h-40 overflow-y-auto border p-2 mb-2 bg-gray-50">
+              {chat.map((c, i) => (
+                <div key={i}>
+                  <p><b>Cliente:</b> {c.user}</p>
+                  <p><b>Bot:</b> {c.bot}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex space-x-2">
+              <input value={input} onChange={(e) => setInput(e.target.value)} 
+                     className="border p-2 flex-1 rounded" placeholder="Pregunta algo: precios, tiempos..." />
+              <button onClick={sendMessage} className="bg-blue-500 text-white px-3 py-1 rounded">Enviar</button>
+            </div>
+          </div>
+
+          {/* Dashboard */}
+          <div className="bg-white p-4 shadow rounded">
+            <h2 className="text-xl font-semibold mb-2">Dashboard Inteligente</h2>
+            <p>Ventas del mes: <b>$12.500.000 COP</b></p>
+            <p>Pedidos procesados: <b>320</b></p>
+            <p className="text-green-600">Predicción: +15% en próximos 30 días 📈</p>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</body>
+</html>
