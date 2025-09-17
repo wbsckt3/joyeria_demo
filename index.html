@@ -36,8 +36,10 @@
 
       const addToCart = (product) => {
         setCart([...cart, product]);
-        alert(`Agregado: ${product.name}. Recomendado: ${products.find(p => p.id === product.recommend)?.name}`);
+        const recommended = products.find(p => p.id === product.recommend);
+        alert(`Agregado: ${product.name}. Recomendado: ${recommended ? recommended.name : "Ninguno"}`);
       };
+
 
       const sendMessage = () => {
         let response = "Lo siento, no entendí tu pregunta.";
